@@ -1,0 +1,12 @@
+name 'cloudsmith-federated_wiki'
+version '0.1.0'
+
+author 'mruzicka'
+license ''
+project_page ''
+source ''
+summary 'Module handling Smallest-Federated-Wiki and its gem dependencies'
+description ''
+dependency 'cloudsmith/apache2', '>=0.1.0'
+dependency 'cloudsmith/passenger', '>=0.1.0'
+dependency 'cloudsmith/rubygems', '>=0.1.0'

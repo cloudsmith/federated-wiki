@@ -1,0 +1,9 @@
+name 'cloudsmith-rubygems'
+version '0.1.0'
+
+author 'mruzicka'
+license ''
+project_page ''
+source ''
+summary 'Module handling installation and updating of the ruby gem system'
+description ''
