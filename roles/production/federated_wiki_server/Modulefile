@@ -1,4 +1,4 @@
-name 'mruzicka-federated_wiki_role'
+name 'mruzicka-federated_wiki_server'
 version '0.0.0'
 
 dependency 'cloudsmith/federated_wiki', '>=0.1.0'
