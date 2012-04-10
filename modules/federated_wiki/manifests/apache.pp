@@ -2,6 +2,8 @@ define federated_wiki::apache($install_dir) {
 	include passenger
 	include apache2::variables
 
+	Exec['bundle-install'] -> Class['passenger']
+
 	file { ["${install_dir}/.ruby_inline", "${install_dir}/data"]:
 		ensure => directory,
 		owner => nobody,
