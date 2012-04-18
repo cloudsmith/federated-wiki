@@ -22,9 +22,9 @@ class federated_wiki {
 	exec { 'bundle-install':
 		unless => 'bundle check',
 		command => 'bundle install',
-		cwd => "${install_dir}",
+		cwd => $install_dir,
 		path => ['/usr/local/bin', '/bin', '/usr/bin'],
-		require => [Package['bundler'], Exec['git-clone']],
+		require => [Package['bundler'], Exec['git-clone', 'git-pull']],
 	}
 
 	package { 'git':
@@ -32,14 +32,22 @@ class federated_wiki {
 	}
 
 	exec { 'git-clone':
+		unless => "test -d \"${install_dir}\"",
 		command => "git clone \"${git_repository}\" \"${install_dir}\"",
 		path => ['/usr/local/bin', '/bin', '/usr/bin'],
-		creates => "${install_dir}",
+		require => Package['git'],
+	}
+
+	exec { 'git-pull':
+		onlyif => "test -d \"${install_dir}\"",
+		command => 'git pull',
+		cwd => $install_dir,
+		path => ['/usr/local/bin', '/bin', '/usr/bin'],
 		require => Package['git'],
 	}
 
 	federated_wiki::apache { 'federated_wiki':
-		install_dir => "${install_dir}",
+		install_dir => $install_dir,
 		require => Exec['bundle-install'],
 	}
 }
