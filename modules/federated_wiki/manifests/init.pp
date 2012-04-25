@@ -1,9 +1,9 @@
-class federated_wiki {
+class federated_wiki(
+	$source_git_repository = 'git://github.com/WardCunningham/Smallest-Federated-Wiki.git',
+	$install_dir = '/var/www/federated-wiki'
+) {
 	include rubygems
 	include rubygems::common_dependencies
-
-	$git_repository = 'git://github.com/WardCunningham/Smallest-Federated-Wiki.git'
-	$install_dir = '/var/www/federated-wiki'
 
 	$build_dependencies = [
 		'libxml2-devel', 'libxslt-devel'
@@ -33,7 +33,7 @@ class federated_wiki {
 
 	exec { 'git-clone':
 		unless => "test -d \"${install_dir}\"",
-		command => "git clone \"${git_repository}\" \"${install_dir}\"",
+		command => "git clone \"${source_git_repository}\" \"${install_dir}\"",
 		path => ['/usr/local/bin', '/bin', '/usr/bin'],
 		require => Package['git'],
 	}
