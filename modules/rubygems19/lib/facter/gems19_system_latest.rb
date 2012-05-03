@@ -4,7 +4,7 @@ if Object.const_defined?(:Facter)
     begin
       # install the rubygems package
       catalog = Puppet::Resource::Catalog.new()
-      catalog.add_resource(Puppet::Resource.new('Package', 'rubygems'))
+      catalog.add_resource(Puppet::Resource.new('Package', 'rubygems19'))
       return if catalog.to_ral.apply().any_failed?()
     rescue SystemExit, NoMemoryError
       raise
@@ -15,10 +15,10 @@ if Object.const_defined?(:Facter)
 
     thisfile = File.expand_path(__FILE__)
 
-    Facter.add('gems_system_latest') do
+    Facter.add('gems19_system_latest') do
       setcode do
         # run this file in a separate ruby interpreter
-        system('ruby', thisfile)
+        system('ruby1.9', thisfile)
       end
     end
   end.call

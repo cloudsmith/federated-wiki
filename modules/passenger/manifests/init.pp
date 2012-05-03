@@ -1,6 +1,6 @@
 class passenger {
-	include rubygems
-	include rubygems::common_dependencies
+	include rubygems19
+	include rubygems19::common_dependencies
 	include apache2
 	include apache2::variables
 
@@ -17,8 +17,8 @@ class passenger {
 
 	package { 'passenger':
 		ensure => latest,
-		provider => gem,
-		require => [Class['rubygems::common_dependencies'], Package[$build_dependencies]],
+		provider => gem19,
+		require => [Class['rubygems19::common_dependencies'], Package[$build_dependencies]],
 	}
 
 	file { "${config_util}":
@@ -33,7 +33,7 @@ class passenger {
 		command => "rm \"${config_file}\"",
 		path => ['/usr/local/bin', '/bin', '/usr/bin'],
 		refreshonly => true,
-		subscribe => [Class['rubygems::common_dependencies'], Package['passenger'], Package[$build_dependencies]],
+		subscribe => [Class['rubygems19::common_dependencies'], Package['passenger'], Package[$build_dependencies]],
 	}
 
 	exec { 'configure':

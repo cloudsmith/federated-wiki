@@ -2,8 +2,8 @@ class federated_wiki(
 	$source_git_repository = 'git://github.com/WardCunningham/Smallest-Federated-Wiki.git',
 	$install_dir = '/var/www/federated-wiki'
 ) {
-	include rubygems
-	include rubygems::common_dependencies
+	include rubygems19
+	include rubygems19::common_dependencies
 
 	$build_dependencies = [
 		'libxml2-devel', 'libxslt-devel'
@@ -15,8 +15,8 @@ class federated_wiki(
 
 	package { 'bundler':
 		ensure => installed,
-		provider => gem,
-		require => [Class['rubygems::common_dependencies'], Package[$build_dependencies]],
+		provider => gem19,
+		require => [Class['rubygems19::common_dependencies'], Package[$build_dependencies]],
 	}
 
 	exec { 'bundle-install':
