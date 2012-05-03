@@ -21,6 +21,19 @@ if Object.const_defined?(:Facter)
         system('ruby1.9', thisfile)
       end
     end
+
+    Facter.add('rubysitedir19') do
+      setcode do
+        IO.popen('-') do |io|
+          if io.nil?
+            ENV.delete('RUBYLIB')
+            exec('ruby1.9', '-e', 'print $:[0]')
+          else
+            io.read()
+          end
+        end
+      end
+    end
   end.call
 else
   # this is executed if not run from facter

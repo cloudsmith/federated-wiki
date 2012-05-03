@@ -22,6 +22,7 @@ class federated_wiki(
 	exec { 'bundle-install':
 		unless => 'bundle check',
 		command => 'bundle install',
+		environment => ["RUBYOPT=-rfix_ruby_revision"],
 		cwd => $install_dir,
 		path => ['/usr/local/bin', '/bin', '/usr/bin'],
 		require => [Package['bundler'], Exec['git-clone', 'git-pull']],
