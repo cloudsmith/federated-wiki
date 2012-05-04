@@ -1,6 +1,7 @@
 class federated_wiki(
 	$source_git_repository = 'git://github.com/WardCunningham/Smallest-Federated-Wiki.git',
-	$install_dir = '/var/www/federated-wiki'
+	$install_dir = '/var/www/federated-wiki',
+	$persistent_device = undef
 ) {
 	include rubygems19
 	include rubygems19::common_dependencies
@@ -22,16 +23,6 @@ class federated_wiki(
 	package { ['bundler', 'memcache-client']:
 		ensure => installed,
 		provider => gem19,
-	}
-
-	exec { 'bundle-install':
-		unless => 'bundle check',
-		command => 'bundle install',
-		environment => ["RUBYOPT=-rfix_ruby_revision"],
-		cwd => $install_dir,
-		timeout => 0,
-		path => ['/usr/local/bin', '/bin', '/usr/bin'],
-		require => [Package['bundler'], Exec['git-clone', 'git-pull'], Class['rubygems19::common_dependencies'], Package[$build_dependencies]],
 	}
 
 	package { ['git', 'patch']:
@@ -60,11 +51,42 @@ class federated_wiki(
 		require => Package['git'],
 	}
 
+	exec { 'bundle-install':
+		unless => 'bundle check',
+		command => 'bundle install',
+		environment => ["RUBYOPT=-rfix_ruby_revision"],
+		cwd => $install_dir,
+		timeout => 0,
+		path => ['/usr/local/bin', '/bin', '/usr/bin'],
+		require => [Package['bundler'], Exec['git-clone', 'git-pull'], Class['rubygems19::common_dependencies'], Package[$build_dependencies]],
+	}
+
+	if($persistent_device != undef) {
+		exec { "mountpoint-${install_dir}/data":
+			unless => 'test -d data',
+			command => 'mkdir data',
+			cwd => $install_dir,
+			path => ['/usr/local/bin', '/bin', '/usr/bin'],
+			require => Exec['bundle-install'],
+		}
+
+		mount { "mount-${install_dir}/data":
+			ensure => mounted,
+			name => "${install_dir}/data",
+			device => $persistent_device,
+			fstype => 'ext3',
+			options => 'defaults',
+			require => Exec["mountpoint-${install_dir}/data"],
+			before => File["${install_dir}/data"],
+		}
+	}
+
 	file { $patch_dir:
 		ensure => directory,
 		owner => root,
 		group => root,
 		mode => 0755,
+		require => Exec['git-clone', 'git-pull'],
 	}
 
 	file { $memcached_patch:
