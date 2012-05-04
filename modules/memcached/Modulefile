@@ -1,4 +1,4 @@
-name 'mruzicka-memcached'
+name 'cloudsmith-memcached'
 version '0.1.0'
 
 author 'mruzicka'
