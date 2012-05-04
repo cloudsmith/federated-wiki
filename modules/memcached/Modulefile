@@ -1,0 +1,9 @@
+name 'mruzicka-memcached'
+version '0.1.0'
+
+author 'mruzicka'
+license ''
+project_page ''
+source ''
+summary 'Minimalistic memcached'
+description ''
