@@ -13,6 +13,8 @@ class federated_wiki(
 	$patch_dir = "${install_dir}/patch"
 	$memcached_patch = "${patch_dir}/memcached.patch"
 
+	$need_pull_util = '/usr/local/lib/git_need_pull.rb'
+
 	package { [$build_dependencies]:
 		ensure => installed,
 	}
@@ -36,6 +38,13 @@ class federated_wiki(
 		ensure => installed,
 	}
 
+	file { $need_pull_util:
+		source => 'puppet:///modules/federated_wiki/git_need_pull.rb',
+		owner => root,
+		group => root,
+		mode => 0644,
+	}
+
 	exec { 'git-clone':
 		unless => "test -d \"${install_dir}\"",
 		command => "git clone \"${source_git_repository}\" \"${install_dir}\"",
@@ -44,7 +53,7 @@ class federated_wiki(
 	}
 
 	exec { 'git-pull':
-		onlyif => "test -d \"${install_dir}\"",
+		onlyif => "test -d \"${install_dir}\" && ruby \"${need_pull_util}\"",
 		command => 'git pull',
 		cwd => $install_dir,
 		path => ['/usr/local/bin', '/bin', '/usr/bin'],
@@ -63,7 +72,7 @@ class federated_wiki(
 		owner => root,
 		group => root,
 		mode => 0644,
-		require =>  File[$patch_dir],
+		require => File[$patch_dir],
 	}
 
 	exec { 'memcached-patch':
