@@ -1,8 +1,22 @@
-diff --git a/server/sinatra/config.ru b/server/sinatra/config.ru
-index f320dbd..b896836 100644
---- a/server/sinatra/config.ru
-+++ b/server/sinatra/config.ru
-@@ -1,2 +1,3 @@
-+use Rack::Session::Memcache
- require File.expand_path('../server', __FILE__)
- run Controller
+diff --git a/server/sinatra/server.rb b/server/sinatra/server.rb
+index 5237d06..d40f733 100644
+--- a/server/sinatra/server.rb
++++ b/server/sinatra/server.rb
+@@ -1,6 +1,7 @@
+ require 'rubygems'
+ require 'bundler'
+ require 'pathname'
++require 'rack/session/memcache'
+ Bundler.require
+ 
+ $LOAD_PATH.unshift(File.dirname(__FILE__))
+@@ -23,7 +24,8 @@ class Controller < Sinatra::Base
+   set :views , File.join(SINATRA_ROOT, "views")
+   set :haml, :format => :html5
+   set :versions, `git log -10 --oneline` || "no git log"
+-  enable :sessions
++  #enable :sessions
++  use Rack::Session::Memcache
+ 
+   Store.set ENV['STORE_TYPE'], APP_ROOT
+ 
