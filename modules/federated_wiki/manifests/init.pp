@@ -62,12 +62,18 @@ class federated_wiki(
 	}
 
 	if($persistent_device != undef) {
+		exec { "mkfs-${persistent_device}":
+			unless => "dumpe2fs -h \"${persistent_device}\"",
+			command => "mkfs -t ext3 \"${persistent_device}\"",
+			path => ['/usr/local/sbin', '/usr/local/bin', '/sbin', '/bin', '/usr/sbin', '/usr/bin'],
+		}
+
 		exec { "mountpoint-${install_dir}/data":
 			unless => 'test -d data',
 			command => 'mkdir data',
 			cwd => $install_dir,
 			path => ['/usr/local/bin', '/bin', '/usr/bin'],
-			require => Exec['bundle-install'],
+			require => Exec['git-clone'],
 		}
 
 		mount { "mount-${install_dir}/data":
@@ -76,7 +82,7 @@ class federated_wiki(
 			device => $persistent_device,
 			fstype => 'ext3',
 			options => 'defaults',
-			require => Exec["mountpoint-${install_dir}/data"],
+			require => Exec["mkfs-${persistent_device}", "mountpoint-${install_dir}/data"],
 			before => File["${install_dir}/data"],
 		}
 	}
@@ -86,7 +92,7 @@ class federated_wiki(
 		owner => root,
 		group => root,
 		mode => 0755,
-		require => Exec['git-clone', 'git-pull'],
+		require => Exec['git-clone'],
 	}
 
 	file { $memcached_patch:
