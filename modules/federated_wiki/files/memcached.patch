@@ -1,5 +1,5 @@
 diff --git a/server/sinatra/server.rb b/server/sinatra/server.rb
-index 5237d06..d40f733 100644
+index 68d0dbe..256f073 100644
 --- a/server/sinatra/server.rb
 +++ b/server/sinatra/server.rb
 @@ -1,6 +1,7 @@
@@ -10,13 +10,13 @@ index 5237d06..d40f733 100644
  Bundler.require
  
  $LOAD_PATH.unshift(File.dirname(__FILE__))
-@@ -23,7 +24,8 @@ class Controller < Sinatra::Base
+@@ -24,7 +25,8 @@ class Controller < Sinatra::Base
    set :views , File.join(SINATRA_ROOT, "views")
    set :haml, :format => :html5
    set :versions, `git log -10 --oneline` || "no git log"
 -  enable :sessions
 +  #enable :sessions
 +  use Rack::Session::Memcache
+   helpers ServerHelpers
  
    Store.set ENV['STORE_TYPE'], APP_ROOT
- 
