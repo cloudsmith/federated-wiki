@@ -4,3 +4,4 @@
 PassengerAppRoot "<%= install_dir %>/server/sinatra"
 # this is used by RubyInline to locate the directory where to store inlined code libraries
 SetEnv INLINEDIR "<%= install_dir %>"
+SetEnv SESSION_STORE "Rack::Session::Memcache"

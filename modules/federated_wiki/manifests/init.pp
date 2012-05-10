@@ -20,7 +20,7 @@ class federated_wiki(
 		ensure => installed,
 	}
 
-	package { ['bundler', 'memcache-client']:
+	package { 'bundler':
 		ensure => installed,
 		provider => gem19,
 	}
@@ -51,6 +51,30 @@ class federated_wiki(
 		require => Package['git'],
 	}
 
+	file { $patch_dir:
+		ensure => directory,
+		owner => root,
+		group => root,
+		mode => 0755,
+		require => Exec['git-clone'],
+	}
+
+	file { $memcached_patch:
+		source => 'puppet:///modules/federated_wiki/memcached.patch',
+		owner => root,
+		group => root,
+		mode => 0644,
+		require => File[$patch_dir],
+	}
+
+	exec { 'memcached-patch':
+		unless => "patch --dry-run --reverse --strip=1 --force --quiet --input=\"${memcached_patch}\"",
+		command => "patch --strip=1 --force --quiet --input=\"${memcached_patch}\"",
+		cwd => $install_dir,
+		path => ['/usr/local/bin', '/bin', '/usr/bin'],
+		require => [Exec['git-clone', 'git-pull'], Package['patch'], File[$memcached_patch]],
+	}
+
 	exec { 'bundle-install':
 		unless => 'bundle check',
 		command => 'bundle install',
@@ -58,7 +82,7 @@ class federated_wiki(
 		cwd => $install_dir,
 		timeout => 0,
 		path => ['/usr/local/bin', '/bin', '/usr/bin'],
-		require => [Package['bundler'], Exec['git-clone', 'git-pull'], Class['rubygems19::common_dependencies'], Package[$build_dependencies]],
+		require => [Package['bundler'], Exec['memcached-patch'], Class['rubygems19::common_dependencies'], Package[$build_dependencies]],
 	}
 
 	if($persistent_device != undef) {
@@ -87,32 +111,8 @@ class federated_wiki(
 		}
 	}
 
-	file { $patch_dir:
-		ensure => directory,
-		owner => root,
-		group => root,
-		mode => 0755,
-		require => Exec['git-clone'],
-	}
-
-	file { $memcached_patch:
-		source => 'puppet:///modules/federated_wiki/memcached.patch',
-		owner => root,
-		group => root,
-		mode => 0644,
-		require => File[$patch_dir],
-	}
-
-	exec { 'memcached-patch':
-		unless => "patch --dry-run --reverse --strip=1 --force --quiet --input=\"${memcached_patch}\"",
-		command => "patch --strip=1 --force --quiet --input=\"${memcached_patch}\"",
-		cwd => $install_dir,
-		path => ['/usr/local/bin', '/bin', '/usr/bin'],
-		require => [Exec['git-clone', 'git-pull'], Package['patch'], File[$memcached_patch]],
-	}
-
 	federated_wiki::apache { 'federated_wiki':
 		install_dir => $install_dir,
-		require => [Class['memcached'], Package['memcache-client'], Exec['bundle-install', 'memcached-patch']],
+		require => [Class['memcached'], Exec['bundle-install']],
 	}
 }
