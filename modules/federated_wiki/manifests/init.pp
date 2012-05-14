@@ -11,9 +11,6 @@ class federated_wiki(
 		'libxml2-devel', 'libxslt-devel'
 	]
 
-	$patch_dir = "${install_dir}/patch"
-	$memcached_patch = "${patch_dir}/memcached.patch"
-
 	$need_pull_util = '/usr/local/lib/git_need_pull.rb'
 
 	package { [$build_dependencies]:
@@ -25,7 +22,7 @@ class federated_wiki(
 		provider => gem19,
 	}
 
-	package { ['git', 'patch']:
+	package { 'git':
 		ensure => installed,
 	}
 
@@ -51,30 +48,6 @@ class federated_wiki(
 		require => Package['git'],
 	}
 
-	file { $patch_dir:
-		ensure => directory,
-		owner => root,
-		group => root,
-		mode => 0755,
-		require => Exec['git-clone'],
-	}
-
-	file { $memcached_patch:
-		source => 'puppet:///modules/federated_wiki/memcached.patch',
-		owner => root,
-		group => root,
-		mode => 0644,
-		require => File[$patch_dir],
-	}
-
-	exec { 'memcached-patch':
-		unless => "patch --dry-run --reverse --strip=1 --force --quiet --input=\"${memcached_patch}\"",
-		command => "patch --strip=1 --force --quiet --input=\"${memcached_patch}\"",
-		cwd => $install_dir,
-		path => ['/usr/local/bin', '/bin', '/usr/bin'],
-		require => [Exec['git-clone', 'git-pull'], Package['patch'], File[$memcached_patch]],
-	}
-
 	exec { 'bundle-install':
 		unless => 'bundle check',
 		command => 'bundle install',
@@ -82,7 +55,7 @@ class federated_wiki(
 		cwd => $install_dir,
 		timeout => 0,
 		path => ['/usr/local/bin', '/bin', '/usr/bin'],
-		require => [Package['bundler'], Exec['memcached-patch'], Class['rubygems19::common_dependencies'], Package[$build_dependencies]],
+		require => [Package['bundler'], Exec['git-clone', 'git-pull'], Class['rubygems19::common_dependencies'], Package[$build_dependencies]],
 	}
 
 	if($persistent_device != undef) {
