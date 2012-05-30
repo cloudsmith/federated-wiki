@@ -97,7 +97,7 @@ class federated_wiki(
 			owner => root,
 			group => root,
 			mode => 0644,
-			after => File["${install_dir}/data"],
+			require => File["${install_dir}/data"],
 		}
 	}
 }
