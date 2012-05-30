@@ -1,7 +1,8 @@
 class federated_wiki(
 	$source_git_repository = 'git://github.com/WardCunningham/Smallest-Federated-Wiki.git',
 	$install_dir = '/var/www/federated-wiki',
-	$persistent_device = undef
+	$persistent_device = undef,
+	$open_id_identifier = undef
 ) {
 	include rubygems19
 	include rubygems19::common_dependencies
@@ -87,5 +88,15 @@ class federated_wiki(
 	federated_wiki::apache { 'federated_wiki':
 		install_dir => $install_dir,
 		require => [Class['memcached'], Exec['bundle-install']],
+	}
+
+	if($open_id_identifier != undef) {
+		file { "${install_dir}/data/status/open_id.identifier":
+			ensure => present,
+			content => template('federated_wiki/open_id.identifier.erb'),
+			owner => root,
+			group => root,
+			mode => 0644,
+		}
 	}
 }
