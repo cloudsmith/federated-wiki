@@ -91,13 +91,21 @@ class federated_wiki(
 	}
 
 	if($open_id_identifier != undef) {
+		file { "${install_dir}/data/status":
+			ensure => directory,
+			owner => nobody,
+			group => nobody,
+			mode => 0755,
+			require => File["${install_dir}/data"],
+		}
+
 		file { "${install_dir}/data/status/open_id.identifier":
 			ensure => present,
 			content => template('federated_wiki/open_id.identifier.erb'),
 			owner => root,
 			group => root,
 			mode => 0644,
-			require => File["${install_dir}/data"],
+			require => File["${install_dir}/data/status"],
 		}
 	}
 }
