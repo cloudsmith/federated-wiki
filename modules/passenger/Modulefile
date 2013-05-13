@@ -1,11 +1,12 @@
 name 'cloudsmith-passenger'
 version '0.1.0'
 
-author 'mruzicka'
-license ''
+author 'Cloudsmith Inc.'
+license 'Apache License 2.0'
 project_page ''
 source ''
 summary 'Module handing installation of passenger gem plus build and configuration of the apache module it provides'
 description ''
+
 dependency 'cloudsmith/apache2', '>=0.1.0'
 dependency 'cloudsmith/rubygems19', '>=0.1.0'

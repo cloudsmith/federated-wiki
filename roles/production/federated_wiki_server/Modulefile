@@ -1,4 +1,7 @@
 name 'cloudsmith-federated_wiki_server'
 version '0.0.0'
 
+author 'Cloudsmith Inc.'
+license 'Apache License 2.0'
+
 dependency 'cloudsmith/federated_wiki', '>=0.1.0'
